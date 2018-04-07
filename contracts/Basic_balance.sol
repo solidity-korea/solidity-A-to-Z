@@ -5,7 +5,7 @@ contract Basic {
     uint256 public a = 10;
     uint256 public b;  // default 0, when without initial
     uint256 internal c = 2;
-    uint256 public balance;
+    uint256 public myBalance;
     
     // sample function, return type, pure, public
     function helloWorld() public pure returns (string) {
@@ -62,11 +62,15 @@ contract Basic {
         c = 5;
         Logging(helloWorld());  // emit Logging(log); from pragma solidity ^0.4.21
         Logging(msg.value);
-        balance += msg.value;
+        myBalance += msg.value;
     }
     
     function getBalacneEther() public view returns (uint256 balanceEther) {
-        return balance / 10**18;
+        return myBalance / 10**18;
+    }
+    
+    function getBalanceFromThis() public view returns (uint256) {
+        return this.balance;
     }
 
     // sample modifier
