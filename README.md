@@ -38,3 +38,4 @@ Code released under the [GPLv3 License](https://github.com/LanguageToken/smart-c
 #### License and copyright notice
 
 - [OpenZeppelin/zeppelin-solidity](https://github.com/OpenZeppelin/zeppelin-solidity) [[MIT]](https://github.com/OpenZeppelin/zeppelin-solidity/blob/master/LICENSE).
+
