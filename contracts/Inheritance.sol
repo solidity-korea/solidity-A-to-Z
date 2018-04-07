@@ -1,31 +1,69 @@
 pragma solidity ^0.4.19;
 
-contract inheritance {
-    mapping(address => uint256) public myNumbers;
-    uint256 public numberCount;
+// code of openzeppelin
 
-    function setMyNumber(uint256 _myNumber) public {
-        if (myNumbers[msg.sender] == 0) {
-            numberCount += 1;
-        }
-        myNumbers[msg.sender] = _myNumber;
-    }
+/**
+ * @title Ownable
+ * @dev The Ownable contract has an owner address, and provides basic authorization control
+ * functions, this simplifies the implementation of "user permissions".
+ */
+contract Ownable {
+  address public owner;
 
-    function getMyNumber() public view returns(uint256 _myNumber) {
-        return myNumbers[msg.sender];
-    }
+  event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
-    function getOtherNumber(address _address) public view returns(uint256 _myNumber) {
-        return myNumbers[_address];
+
+  /**
+   * @dev The Ownable constructor sets the original `owner` of the contract to the sender
+   * account.
+   */
+  function Ownable() public {
+    owner = msg.sender;
+  }
+
+  /**
+   * @dev Throws if called by any account other than the owner.
+   */
+  modifier onlyOwner() {
+    require(msg.sender == owner);
+    _;
+  }
+
+  /**
+   * @dev Allows the current owner to transfer control of the contract to a newOwner.
+   * @param newOwner The address to transfer ownership to.
+   */
+  function transferOwnership(address newOwner) public onlyOwner {
+    require(newOwner != address(0));
+    OwnershipTransferred(owner, newOwner);
+    owner = newOwner;
+  }
+
+}
+
+
+contract Inheritance is Ownable {
+    string public name = "Inheritance";
+}
+
+
+
+contract ChangeName is Ownable{
+    string public name = "ChangeName";
+
+    function changeName(string _name) public onlyOwner {
+        name = _name;
     }
+}
+
+contract Inheritance2 is Inheritance, ChangeName {
+
+}
+
+contract Inheritance3 is ChangeName, Inheritance {
     
-    modifier checkNumber() {
-        require(myNumbers[msg.sender] != 0);
-        _;
-    }
-    
-    function deleteNumber() public checkNumber {
-        myNumbers[msg.sender] = 0;
-        numberCount -= 1;
-    }
+}
+
+contract Inheritance4 is ChangeName, Inheritance {
+    string public name = "Inheritance4";
 }
