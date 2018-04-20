@@ -147,26 +147,12 @@ contract Deposit {
 
     // 전체 deposit 중, returned 된 deposit 의 갯수를 반환하는 함수
     function totalReturnedCount() public view returns (uint256) {
-        uint256 _depositCount = totalDepositCount();
-        uint256 count;
-        for (uint256 i=0; i < _depositCount; i++) {
-            if ( depositList[i].state == DepositState.Returned ) {
-                count++;
-            }
-        }
-        return count;
+        // 실습
     }
 
     // 자신의 deplist 중 returned 된 deposit 의 갯수를 반환하는 함수
     function myReturnedCount() public view returns (uint256) {
-        uint256 _myDepositCount = myDepositCount();
-        uint256 count;
-        for (uint256 i=0; i < _myDepositCount; i++) {
-            if ( depositList[userDepositList[msg.sender][i]].state == DepositState.Returned ) {
-                count++;
-            }
-        }
-        return count;
+        // 실습
     }
 
 }
