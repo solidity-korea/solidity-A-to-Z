@@ -52,6 +52,14 @@ contract Basic2 {
         }
         return result;
     }
+    
+    event Logging(uint, uint, uint);
+    function gugudan(uint _input) public {
+        for (uint i = 1; i < 10; i++) {
+            emit Logging(_input, i, _input * i);
+        }
+    }
+    
 
     struct Note {
         uint time; // time of start burrow
