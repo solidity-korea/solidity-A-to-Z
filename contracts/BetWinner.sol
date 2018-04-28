@@ -105,9 +105,7 @@ contract BetWinner is Ownable {
     uint32 public bettingEnd;
     uint32 public winnerAnnounced;
 
-    uint8 public feePercentage;
     uint public minimumBet;
-    uint public totalFee;
 
     // events
     event BetPlaced(address indexed _from, uint8 indexed _teamId, uint _value);
@@ -117,8 +115,7 @@ contract BetWinner is Ownable {
 
     // constructor
     function BetWinner() public Ownable() {
-        feePercentage = 2;
-        minimumBet = 100 szabo;
+        minimumBet = 10 ** 17 wei;
     }
 
     // get bettingStart, bettingEnd, winnerAnnounced, winnerIndex, teams count
@@ -133,19 +130,24 @@ contract BetWinner is Ownable {
     }
 
     // remember to add all teams before calling startBetting
-    function addTeam(string _name) public onlyOwner {
+    function addTeam(string _name) public onlyOwner returns (uint _id) {
         require(!inited);
         Team memory t = Team({
             name: _name,
             bets: 0,
-            bettors: new address[](0)
+            bettors: new address[](0) // array size == 0
             });
         teams.push(t);
+        return teams.length-1;
     }
 
     // set betting start and stop times. after that teams cannot be added
     function startBetting(uint32 _bettingStart, uint32 _bettingEnd) public onlyOwner {
         require(!inited);
+        if (_bettingStart==0 || _bettingEnd==0 ){
+            _bettingStart = uint32(now);
+            _bettingEnd = uint32(now+(60*5));
+        }
 
         bettingStart = _bettingStart;
         bettingEnd = _bettingEnd;
@@ -161,9 +163,9 @@ contract BetWinner is Ownable {
     }
 
     // get team data (name, total bets, bettor count)
-    function getTeam(uint8 teamIndex) view public returns (string, uint, uint) {
+    function getTeam(uint8 teamIndex) view public returns (string, uint, uint, address[]) {
         Team memory t = teams[teamIndex];
-        return (t.name, t.bets, t.bettors.length);
+        return (t.name, t.bets, t.bettors.length, t.bettors);
     }
 
     // get total bets for every team
@@ -202,22 +204,6 @@ contract BetWinner is Ownable {
         team.bettorAmount[msg.sender] += msg.value;
     }
 
-    // calculate fee from the losing portion of total pot
-    function removeFeeAmount(uint totalPot, uint winnersPot) private returns(uint) {
-        uint remaining = SafeMath.sub(totalPot, winnersPot);
-        // if we only have winners, take no fee
-        if (remaining == 0) {
-            return 0;
-        }
-
-        // calculate fee
-        uint feeAmount = SafeMath.div(remaining, 100);
-        feeAmount = feeAmount * feePercentage;
-
-        totalFee = feeAmount;
-        // return loser side pot - fee = winnings
-        return remaining - feeAmount;
-    }
 
     // announce winner
     function announceWinner(uint8 teamIndex) public onlyOwner {
@@ -243,8 +229,7 @@ contract BetWinner is Ownable {
             return;
         }
 
-        // substract fee
-        uint winnings = removeFeeAmount(totalAmount, winTeamAmount);
+        uint winnings =  SafeMath.sub(totalAmount, winTeamAmount);
 
         // calc percentage of total pot for every winner bettor
         for (uint i = 0; i < wt.bettors.length; i++) {
@@ -275,16 +260,6 @@ contract BetWinner is Ownable {
         msg.sender.transfer(po);
     }
 
-    // withdraw owner fee when winner is announced
-    function withdrawFee() public onlyOwner {
-        require(totalFee > 0);
-        // owner cannot withdraw fee before winner is announced. This is incentive for contract owner to announce winner
-        require(winnerAnnounced > 0 && now > winnerAnnounced);
-        // make sure owner cannot withdraw more than fee amount
-        msg.sender.transfer(totalFee);
-        // set total fee to zero, so owner cannot empty whole contract
-        totalFee = 0;
-    }
 
     // cancel and set all bets to payouts
     function cancel() public onlyOwner {
