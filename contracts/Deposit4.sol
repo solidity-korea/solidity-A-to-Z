@@ -14,6 +14,10 @@ contract Deposit is StandardToken {
     string public constant name = "Bond Token"; // solium-disable-line uppercase
     string public constant symbol = "BOND"; // solium-disable-line uppercase
     uint8 public constant decimals = 18; // solium-disable-line uppercase
+    
+    function returnNow() public view returns (uint256) {
+        return now;
+    }
 
     enum DepositState { Deposited, Returned }  // 유저가 선언하는 열거형 자료형, 내부적으로  0, 1, 2.. 순으로 인덱스돼어 uint8 로 저장됨
     // https://solidity.readthedocs.io/en/develop/types.html#enums
@@ -23,6 +27,7 @@ contract Deposit is StandardToken {
         uint256 time;  // deposit 한 시간(block)의 unix timestamp
         uint256 value; // deposit 한 값
         uint256 balance;  // depsoit 한 값에서 일부 찾아가고 남은 값
+        uint256 timelock; 
         address owner;  // deposit 한 msg.sender
         DepositState state;  // enum DepositState, Deposited 혹은 Reterned 를 저장 ( 0, 1 )
     }
@@ -67,6 +72,7 @@ contract Deposit is StandardToken {
         DepositTx memory depositTx = DepositTx({
             id: depositList.length,  // depositList 의 length 를 통해 id 지정
             time: uint256(now), // now == block.timestamp
+            timelock: uint256(now) + 30, // now == block.timestamp
             value: msg.value, // deposit 값(고정),
             balance: msg.value,  // 남은 잔액 둘다 우선 msg.value 로 할당
             owner: msg.sender,
@@ -106,10 +112,18 @@ contract Deposit is StandardToken {
         require(depositList[_deposit_id].owner == msg.sender);
         _;
     }
+    
+    modifier checkTimelock(uint256 _deposit_id) {
+        require(depositList[_deposit_id].timelock <= uint256(now));
+        _;
+    }
 
+    function ownershipTransfer(uint256 _deposit_id, address _target) public onlyOnwer(_deposit_id) {
+        depositList[_deposit_id].owner = _target;
+    }
 
     // deposit id 를 받아 deposit 잔액 전체를 claim 을 진행하는 함수
-    function claim(uint256 _deposit_id) public onlyOnwer(_deposit_id) returns (bool) {
+    function claim(uint256 _deposit_id) public onlyOnwer(_deposit_id) checkTimelock(_deposit_id) returns (bool) {
         require(depositList[_deposit_id].state == DepositState.Deposited  // returned 상태가아니라 deposit 상태인지 확인
         && depositList[_deposit_id].balance > 0);  // AND 논리 연산, 잔액이 0 보다 큰지 확인
 
@@ -126,7 +140,7 @@ contract Deposit is StandardToken {
     }
 
     // deposit_id 와, 해당 deposit 의 잔액에서 일부만 claim 하기위한 value 값을 인자로 받는 부분 claim 함수
-    function claimPartially(uint256 _deposit_id, uint256 _value) public onlyOnwer(_deposit_id) returns (bool) {
+    function claimPartially(uint256 _deposit_id, uint256 _value) public onlyOnwer(_deposit_id) checkTimelock(_deposit_id) returns (bool) {
         require(depositList[_deposit_id].state == DepositState.Deposited  // returned 상태가아니라 deposit 상태인지 확인
         && depositList[_deposit_id].balance >= _value);   // AND 논리 연산, 잔액이 _value 보다 같거나 큰지 확인
 
