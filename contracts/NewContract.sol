@@ -1,14 +1,6 @@
 pragma solidity ^0.4.23;
 
-/* from https://www.toshblocks.com/solidity/creating-contracts-via-new-operator/
-* @title Example the for Solidity Course
-* @author Ethereum Community
-* @updated by dongsamb
-*/
-
-// A contract can create a new contract using the new keyword.
-// The full code of the contract being created has to be known in advance,
-// so recursive creation-dependencies are not possible.
+/* from https://www.toshblocks.com/solidity/creating-contracts-via-new-operator */
 
 // lets define a simple contract D with payable modifier
 contract D {
@@ -18,9 +10,6 @@ contract D {
         x = a;
     }
 
-    function viewBalance() view public returns (uint256) {
-        return address(this).balance;
-    }
 }
 
 
@@ -38,10 +27,4 @@ contract C {
         return newD;
     }
 
-    // You can also create a conract and at the same time transfer some ethers to it.
-    function createAndEndowD(uint arg, uint amount) public returns (address){
-        // Send ether along with the creation of the contract
-        D newD = (new D).value(amount)(arg);
-        return newD;
-    }
 }
