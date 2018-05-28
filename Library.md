@@ -29,7 +29,7 @@
 - `solc --bin LibTest.sol`
 - `solc --bin LibTest.sol | solc --link --libraries LibTest.sol:MathUtils:0x95816bd09ce1ac416f2d07a7e2d2dbbbf17b9337`
 - `solc --bin LibTest.sol --libraries LibTest.sol:MathUtils:0x95816bd09ce1ac416f2d07a7e2d2dbbbf17b9337`
-
 - https://solidity.readthedocs.io/en/v0.4.24/using-the-compiler.html
 
-
+### usages
+- https://solidity.readthedocs.io/en/v0.4.24/contracts.html#libraries
