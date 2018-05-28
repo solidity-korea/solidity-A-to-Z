@@ -5,19 +5,19 @@
 - Cannot inherit nor be inherited
 - Cannot receive Ether
 - 선언 
-    - **library** *Name* { code }
+    - **library** *Name* { code }
 - 사용
-    - `using Name for uint256;` // type
-    - `using Name for *;`  // wildcard type
+    - `using Name for uint256;` // type
+    - `using Name for *;`  // wildcard type
 - https://solidity.readthedocs.io/en/v0.4.24/contracts.html#libraries
 
 
 ### Library 예제
 - safeMath  https://github.com/solidity-korea/solidity-A-to-Z/blob/master/contracts/OverflowUnderflow.sol
-    - **internal, private** function 으로 구성된 Library 는 통합 배포됨
+    - **internal, private** function 으로 구성된 Library 는 통합 배포됨
 - MathUtils 올림, 내림, 반올림 Library 예제
     - https://github.com/solidity-korea/solidity-A-to-Z/blob/master/contracts/LibTest.sol
-    - **public, external** function 으로 구성된 Library 는 통합 별도 배포, link 필요
+    - **public, external** function 으로 구성된 Library 는 통합 별도 배포, link 필요
 
 
 ### Library Deploy, Verify
