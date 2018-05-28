@@ -30,3 +30,12 @@ library MathUtils {
         }
     }
 }
+
+contract LibTest {
+    using MathUtils for uint256;
+
+    function roundOffTest(uint256 _input, uint256 _decimals) pure public returns (uint256) {
+        return _input.roundOff(_decimals);
+    }
+
+}
